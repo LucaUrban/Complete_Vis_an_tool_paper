@@ -434,7 +434,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         with left: 
             fea_Imp_features = st.multiselect("Feature Importance multiselection box:", col_mul)
         with right:
-            id_sel = st.selectbox("multivariable index col", ['All ids'] + list(table[id_sel_col].unique()), 0)
+            id_sel = st.selectbox("Index selection box:", ['All ids'] + list(table[id_sel_col].unique()), 0)
         
         scaler = StandardScaler()
         if id_sel == 'All ids':
