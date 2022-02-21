@@ -65,8 +65,147 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
     lis_check = [{'label': col, 'value': col} for col in col_mul if col != col_mul[0]]
 
     widget = st.selectbox("what is the widget you want to display:",
-                          ["Ratio Analysis", "Multidimensional Analysis", "Autocorrelation Analysis", "Feature Importance Analysis", "Anomalies check", "Consistency checks"], 0)
+                          ["Data View", "Correlation Analysis", "Map Analysis", "Monodimensional Analysis", "Ratio Analysis", "Multidimensional Analysis", 
+                           "Autocorrelation Analysis", "Feature Importance Analysis", "Anomalies check", "Consistency checks", "Time series forecasting"], 0)
+    
+    if widget == "Data View":
+        # showing the table with the data
+        st.header("Table")
+        st.write("Data contained into the dataset:", table)
+    
+    if widget == "Map Analysis":
+        # map-box part
+        st.sidebar.subheader("Map area")
+        nut_col = st.sidebar.selectbox("select the nut column", table.columns, 0)
+        map_feature = st.sidebar.selectbox("select the feature column", col_mul, 0)
+        map_q = st.sidebar.number_input("insert the quantile value", 0, 100, 50)
 
+        st.header("Map")
+
+        res = {nut_col: table[nut_col].unique(), map_feature: []}
+        for nut_id in res[nut_col]:
+            res[map_feature].append(table[table[nut_col] == nut_id][map_feature].quantile(map_q/100))
+        res = pd.DataFrame(res)
+
+        px.set_mapbox_access_token("pk.eyJ1IjoibHVjYXVyYmFuIiwiYSI6ImNrZm5seWZnZjA5MjUydXBjeGQ5ZDBtd2UifQ.T0o-wf5Yc0iTSeq-A9Q2ww")
+        map_box = px.choropleth_mapbox(res, geojson = eu_nut2, locations = res[nut_col], featureidkey = 'properties.id',
+                                   color = map_feature, color_continuous_scale = px.colors.cyclical.IceFire,
+                                   range_color = (res[map_feature].min(), res[map_feature].max()),
+                                   mapbox_style = "carto-positron",
+                                   zoom = 3, center = {"lat": 47.4270826, "lon": 15.5322329},
+                                   opacity = 0.5,
+                                   labels = {map_feature: map_feature})
+
+        st.plotly_chart(map_box, use_container_width=True)
+    
+    if widget == "Monodimensional Analysis":
+        # mono variable analysis part
+        st.header("Monodimension Analysis")
+
+        st.sidebar.subheader("Monovariable Area")
+        monoVar_col = st.sidebar.selectbox("select the monovariable feature", col_an, 6)
+        monoVar_type = st.sidebar.selectbox("select the type of the chart", ["gauge plot", "pie chart"], 0)
+
+        if monoVar_type == "gauge plot":
+            monoVar_plot = go.Figure(go.Indicator(
+                mode = "gauge+number+delta",
+                value = table[monoVar_col].mean(),
+                delta = {"reference": 2 * table[monoVar_col].mean() - table[monoVar_col].quantile(0.95)},
+                domain = {'x': [0, 1], 'y': [0, 1]},
+                gauge = {'axis': {'range': [table[monoVar_col].min(), table[monoVar_col].max()]},
+                         'steps' : [
+                             {'range': [table[monoVar_col].min(), table[monoVar_col].quantile(0.05)], 'color': "lightgray"},
+                             {'range': [table[monoVar_col].quantile(0.95), table[monoVar_col].max()], 'color': "gray"}]},
+                title = {'text': "Gauge plot for the variable: " + monoVar_col}))
+        else:
+            monoVar_plot = px.pie(table, names = monoVar_col, title = "Pie chart for the variable: " + monoVar_col)
+
+        st.plotly_chart(monoVar_plot, use_container_width=True)
+        
+    if widget == "Correlation Analysis":
+        heat_cols = st.multiselect("Choose the columns for the correlation heatmap:", col_mul)
+        
+        if len(heat_cols) >= 2:
+            fig_heat = px.imshow(table[heat_cols].corr(), x = heat_cols,  y = heat_cols, 
+                                 labels = dict(color = "Corr Value"), color_continuous_scale = px.colors.sequential.Hot)
+            st.plotly_chart(fig_heat, use_container_width=True)
+        else:
+            st.warning("Yuo have to choose at least two columns")
+            
+    if widget == "Time series forecasting":
+        st.header("Time series forecasting")
+
+        use_col = st.sidebar.selectbox("Chosen Variable", col_mul, 0)
+        modality = st.sidebar.selectbox("Forecasting Method", ["Rolling Forecast", "Recurring Forecast"], 0)
+        index = st.sidebar.selectbox("Index col", table.columns, 0)
+        time = st.sidebar.selectbox("Time col", table.columns, 0)
+ 
+        # pre-work
+        data = table[[index, time, use_col]].sort_values(by=[time])
+        res = np.array([]); ids = []
+        for id in data[index].unique():
+            el = data[data[index] == id][use_col]
+            n = len(list(data[time].unique()))
+            if el.shape[0] == n:
+                res = np.concatenate([res, el.values])
+                ids.append(id)
+        res = res.reshape(res.shape[0]//n, n)
+        col_mean = np.nanmean(res, axis = 1)
+
+        #Find indices that you need to replace
+        inds = np.where(np.isnan(res))
+
+        #Place column means in the indices. Align the arrays using take
+        res[inds] = np.take(col_mean, inds[1])
+        
+        # fit the init model and making the predictions
+        pred_ar = np.array([]); pred_ma = np.array([]); pred_arma = np.array([]); pred_arima = np.array([])
+
+        for i in range(res.shape[0]):
+            pred_ar = np.append(pred_ar, AutoReg(res[i, 0:res.shape[1]-1], lags = 1).fit().predict(len(res), len(res)))
+            pred_ma = np.append(pred_ma, ARIMA(res[i, 0:res.shape[1]-1], order=(0, 0, 1)).fit().predict(len(res), len(res)))
+            pred_arma = np.append(pred_arma, ARIMA(res[i, 0:res.shape[1]-1], order=(2, 0, 1)).fit().predict(len(res), len(res)))
+            pred_arima = np.append(pred_arima, ARIMA(res[i, 0:res.shape[1]-1], order=(1, 1, 1)).fit().predict(len(res), len(res), typ='levels'))
+        
+        
+        # visual part
+        mse_mins = np.array([mean_squared_error(pred_ar, res[:, res.shape[1]-1]), mean_squared_error(pred_ma, res[:, res.shape[1]-1]),
+                             mean_squared_error(pred_arma, res[:, res.shape[1]-1]), mean_squared_error(pred_arima, res[:, res.shape[1]-1])])
+        st.table(pd.DataFrame(mse_mins.reshape((1, 4)), columns = ['AR', 'MA', 'ARMA', 'ARIMA'], index = ['MSE error']))
+         
+        ch_model = st.selectbox("Choose the model you want to use to forecast the next periods", ['AR', 'MA', 'ARMA', 'ARIMA'])
+        ch_id = st.selectbox("Choose element you want to forecast", ids)
+        num_fut_pred = st.sidebar.number_input("Insert the number of periods you want to forecast ", 1, 10, 1)
+        fig_forecasting = go.Figure()
+        
+        # forecasting
+        par_for = []; rif = res[ids.index(ch_id)]
+        for i in range(num_fut_pred + 1):
+            # prediction based on the chosen model
+            if ch_model == 'AR':
+                pred = AutoReg(rif, lags = 1).fit().predict(len(rif), len(rif))[0]
+
+            if ch_model == 'MA':
+                pred = ARIMA(rif, order=(0, 0, 1)).fit().predict(len(rif), len(rif))[0]
+
+            if ch_model == 'ARMA':
+                pred = ARIMA(rif, order=(2, 0, 1)).fit().predict(len(rif), len(rif))[0]
+
+            if ch_model == 'ARIMA':
+                pred = ARIMA(rif, order=(1, 1, 1)).fit().predict(len(rif), len(rif))[0]
+                
+            par_for.append(pred); rif = np.append(rif, pred)
+            # rolling forecasting
+            if modality == "Rolling Forecast":
+                rif = rif[1:]
+        
+        fig_forecasting.add_trace(go.Scatter(x = [max(list(data[time].unique())) + j for j in range(num_fut_pred + 1)], 
+                                             y = [res[ids.index(ch_id), -1]] + par_for, mode = 'lines+markers', name = "Prediction", line = dict(color = 'firebrick')))
+        fig_forecasting.add_trace(go.Scatter(x = list(data[time].unique()), y = data[data[index] == ch_id][use_col].values, mode = 'lines+markers', name = "Value", 
+                                             line = dict(color = 'royalblue')))
+        fig_forecasting.update_layout(xaxis_title = use_col, yaxis_title = time, title_text = "Values over time with future predictions")
+        st.plotly_chart(fig_forecasting, use_container_width=True)
+    
     if widget == "Ratio Analysis":
         # ratio analysis part
         st.header("Ratio Analysis")
