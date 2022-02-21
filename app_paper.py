@@ -70,7 +70,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
     
     if widget == "Data View":
         # showing the table with the data
-        st.header("Table")
+        st.header("Data View")
         st.write("Data contained into the dataset:", table)
     
     if widget == "Map Analysis":
