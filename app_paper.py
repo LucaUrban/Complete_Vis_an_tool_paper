@@ -1149,7 +1149,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                                                index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases'])
                 st.table(summ_table)
             
-            trend_type = st.selectbox('Choose the institution trend type you want to vizualize', list(dict_trend.keys()), 0)
+            trend_type = st.selectbox('Choose the institution trend type you want to visualize', list(dict_trend.keys()), 0)
             trend_inst = st.selectbox('Choose the institution you want to vizualize', dict_trend[trend_type])
             line_trend_ch_inst = px.line(table[table[con_checks_id_col] == trend_inst][[con_checks_features, 'Reference year']], x = 'Reference year', y = con_checks_features)
             line_trend_ch_inst.update_yaxes(range = [0, max(table[table[con_checks_id_col] == trend_inst][con_checks_features].values) + (.05 * max(table[table[con_checks_id_col] == trend_inst][con_checks_features].values))])
