@@ -810,7 +810,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                         if row != len(list_fin_res)-1 and i == len(list_fin_res[row])-1:
                             den = len(table[table[cat_sel_col] == categories[row]][con_checks_id_col].unique())
                         if row == len(list_fin_res)-1 and i == len(list_fin_res[row])-1:
-                            den = table.shape[0]
+                            den = len(table[con_checks_id_col].unique())
                         num = list_fin_res[row][i]
                         if den != 0:
                             num_app = round(100 * num/den, 2); list_fin_res[row][i] = str(list_fin_res[row][i]) + '\n(' + str(num_app) + '%)'
