@@ -834,6 +834,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                             ones = ones - (ones & twos)
                     else:
                         ones = set(table[table[flags_col] == 1][con_checks_id_col].values); twos = set(table[table[flags_col] == 2][con_checks_id_col].values)
+                    st.write(flag_notes_on)
                     if flag_notes_on:
                         summ_table = pd.DataFrame([[str(len(twos.intersection(dict_check_flags[con_checks_feature]))) + ' over ' + str(len(twos)), str(round((100 * len(twos.intersection(dict_check_flags[con_checks_feature]))) / len(twos), 2)) + '%'], 
                                                    [str(len(dict_check_flags[con_checks_feature])) + ' / ' + str(len(ones.union(twos))), str(round(100 * (len(dict_check_flags[con_checks_feature]) / len(ones.union(twos))), 2)) + '%'], 
@@ -1204,7 +1205,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
             # part of confronting trends
             conf_trend_radio = st.radio("Do you want to compare trends?", ('Yes', 'No'), key = 'conf_trend_ratio')
             if conf_trend_radio == 'Yes':
-                conf_trend_var = st.selectbox("Variables chosen for the consistency checks:", col_mul, key = 'conf_trend_var'); set_not_det = set()
+                conf_trend_var = st.selectbox("Select the variable that you want to compare:", col_mul, key = 'conf_trend_var'); set_not_det = set()
                 set_inc_inc = set(); set_inc_ukn = set(); set_inc_dec = set()
                 set_ukn_inc = set(); set_ukn_ukn = set(); set_ukn_dec = set()
                 set_dec_inc = set(); set_dec_ukn = set(); set_dec_dec = set()
