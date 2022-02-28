@@ -65,7 +65,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
     lis_check = [{'label': col, 'value': col} for col in col_mul if col != col_mul[0]]
 
     widget = st.selectbox("what is the widget you want to display:",
-                          ["Data View", "Correlation Analysis", "Map Analysis", "Monodimensional Analysis", "Ratio Analysis", "Multidimensional Analysis", 
+                          ["Data View", "Correlation Analysis", "Geographical Analysis", "Mono dimensional Analysis", "Ratios Analysis", "Multi-dimensional Analysis", 
                            "Autocorrelation Analysis", "Feature Importance Analysis", "Anomalies check", "Consistency checks", "Time series forecasting"], 0)
     
     if widget == "Data View":
@@ -73,14 +73,14 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         st.header("Data View")
         st.write("Data contained into the dataset:", table)
     
-    if widget == "Map Analysis":
+    if widget == "Geographical Analysis":
         # map-box part
         st.sidebar.subheader("Map area")
-        nut_col = st.sidebar.selectbox("select the nut column", table.columns, 0)
-        map_feature = st.sidebar.selectbox("select the feature column", col_mul, 0)
-        map_q = st.sidebar.number_input("insert the quantile value", 0, 100, 50)
+        nut_col = st.sidebar.selectbox("Nut column", table.columns, 0)
+        map_feature = st.sidebar.selectbox("Feature column", col_mul, 0)
+        map_q = st.sidebar.number_input("Quantile value", 0, 100, 50)
 
-        st.header("Map")
+        st.header("Geographical Analysis")
 
         res = {nut_col: table[nut_col].unique(), map_feature: []}
         for nut_id in res[nut_col]:
@@ -117,13 +117,13 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
 
         st.plotly_chart(map_box, use_container_width=True)
     
-    if widget == "Monodimensional Analysis":
+    if widget == "Mono dimensional Analysis":
         # mono variable analysis part
         st.header("Monodimension Analysis")
 
         st.sidebar.subheader("Monovariable Area")
-        monoVar_col = st.sidebar.selectbox("select the monovariable feature", col_an, 6)
-        monoVar_type = st.sidebar.selectbox("select the type of the chart", ["gauge plot", "pie chart"], 0)
+        monoVar_col = st.sidebar.selectbox("Monovariable feature", col_an, 6)
+        monoVar_type = st.sidebar.selectbox("Chart type", ["gauge plot", "pie chart"], 0)
 
         if monoVar_type == "gauge plot":
             monoVar_plot = go.Figure(go.Indicator(
@@ -142,7 +142,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         st.plotly_chart(monoVar_plot, use_container_width=True)
         
     if widget == "Correlation Analysis":
-        heat_cols = st.multiselect("Choose the columns for the correlation heatmap:", col_mul)
+        heat_cols = st.multiselect("Columns correlation heatmap:", col_mul)
         
         if len(heat_cols) >= 2:
             fig_heat = px.imshow(table[heat_cols].corr(), x = heat_cols,  y = heat_cols, 
@@ -192,9 +192,9 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                              mean_squared_error(pred_arma, res[:, res.shape[1]-1]), mean_squared_error(pred_arima, res[:, res.shape[1]-1])])
         st.table(pd.DataFrame(mse_mins.reshape((1, 4)), columns = ['AR', 'MA', 'ARMA', 'ARIMA'], index = ['MSE error']))
          
-        ch_model = st.selectbox("Choose the model you want to use to forecast the next periods", ['AR', 'MA', 'ARMA', 'ARIMA'])
-        ch_id = st.selectbox("Choose element you want to forecast", ids)
-        num_fut_pred = st.sidebar.number_input("Insert the number of periods you want to forecast ", 1, 10, 1)
+        ch_model = st.selectbox("Model to apply", ['AR', 'MA', 'ARMA', 'ARIMA'])
+        ch_id = st.selectbox("Id to forecast", ids)
+        num_fut_pred = st.sidebar.number_input("Number of periods to forecast", 1, 10, 1)
         fig_forecasting = go.Figure()
         
         # forecasting
@@ -225,15 +225,15 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         fig_forecasting.update_layout(xaxis_title = use_col, yaxis_title = time, title_text = "Values over time with future predictions")
         st.plotly_chart(fig_forecasting, use_container_width=True)
     
-    if widget == "Ratio Analysis":
+    if widget == "Ratios Analysis":
         # ratio analysis part
-        st.header("Ratio Analysis")
+        st.header("Ratios Analysis")
 
         st.sidebar.subheader("Ratio Area")
-        ratio_num = st.sidebar.multiselect("select the ratio numerator", col_mul)
-        ratio_den = st.sidebar.multiselect("select the ratio denominator", col_mul)
+        ratio_num = st.sidebar.multiselect("Variables ratio numerator", col_mul)
+        ratio_den = st.sidebar.multiselect("Variables ratio denominator", col_mul)
         
-        new_ratio_name = st.text_input('Write here the name of the new ratio', 'R_1')
+        new_ratio_name = st.text_input('Name of the new ratio', 'R_1')
         
         if len(ratio_num) == 1 and len(ratio_den) == 1:
             table = pd.concat([table, pd.DataFrame(np.divide(table[ratio_num].values, table[ratio_den].values), columns = [new_ratio_name])], axis = 1)
@@ -256,9 +256,9 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         # map pplot + violin plot on the aggregated results
         left, right = st.columns(2)
         with left: 
-            ratio_vio_sel1 = st.selectbox("multivariable index col", table.columns, 0)
+            ratio_vio_sel1 = st.selectbox("First category col (or nut id col)", table.columns, 0)
         with right:
-            ratio_vio_sel2 = st.selectbox("multivariable index col", ['-'] + list(table.columns), 0)
+            ratio_vio_sel2 = st.selectbox("Second category column", ['-'] + list(table.columns), 0)
         
         table['Sel'] = table[ratio_vio_sel1].str.slice(0, 2).values
         res = {ratio_vio_sel1: table[ratio_vio_sel1].unique(), 'R_1': []}
@@ -278,7 +278,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         st.plotly_chart(map_box, use_container_width=True)
         
         uniques = list(table['Sel'].unique())
-        cou_sel = st.selectbox("Choose the specific id you want to explore", ['All ids'] + uniques, 0)
+        cou_sel = st.selectbox("Id to explore", ['All ids'] + uniques, 0)
         if cou_sel == 'All ids':
             if ratio_vio_sel2 == '-':
                 fig_vio = px.violin(table, y = new_ratio_name, box = True, points = 'suspectedoutliers', title = 'Violin plot for the created ratio')
@@ -297,16 +297,16 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         st.write('If you want to download the result file with the new ratio clik on the following button:')
         st.download_button(label = "Download data with lables", data = table.to_csv(index = None, sep = ';').encode('utf-8'), file_name = 'result.csv', mime = 'text/csv')
     
-    if widget == "Multidimensional Analysis":
+    if widget == "Multi-dimensional Analysis":
         # multi variable analysis part
-        st.header("Multidimension Analysis")
+        st.header("Multi-dimension Analysis")
 
         st.sidebar.subheader("Multivariable Area")
-        multi_index = st.sidebar.selectbox("multivariable index col", table.columns, 1)
-        multi_time = st.sidebar.selectbox("multivariable time col", table.columns, 3)
-        multiXax_col = st.sidebar.selectbox("multivariable X axis col", col_mul, 1)
-        multiYax_col = st.sidebar.selectbox("multivariable Y axis col", col_mul, 2)
-        multiSlider = st.sidebar.slider("multivarible time value", int(table[multi_time].min()), int(table[multi_time].max()), int(table[multi_time].min()))
+        multi_index = st.sidebar.selectbox("Multivariable index col", table.columns, 1)
+        multi_time = st.sidebar.selectbox("Multivariable time col", table.columns, 3)
+        multiXax_col = st.sidebar.selectbox("Multivariable X axis col", col_mul, 1)
+        multiYax_col = st.sidebar.selectbox("Multivariable Y axis col", col_mul, 2)
+        multiSlider = st.sidebar.slider("Multivarible time value", int(table[multi_time].min()), int(table[multi_time].max()), int(table[multi_time].min()))
 
         dff = table[table[multi_time] == multiSlider]
         multi_plot = px.scatter(x = dff[multiXax_col], y = dff[multiYax_col], hover_name = dff[multi_index])
@@ -317,7 +317,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         st.plotly_chart(multi_plot, use_container_width=True)
 
         # time control charts
-        el_id = st.selectbox("element ID for time control chart", table[multi_index].unique(), 1)
+        el_id = st.selectbox("Id time control charts", table[multi_index].unique(), 1)
 
         dff_tcc = table[table[multi_index] == el_id][[multi_time, multiXax_col, multiYax_col]]
         if len(list(dff_tcc[multi_time].unique())) < dff_tcc.shape[0]:
@@ -362,10 +362,10 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         st.header("Autocorrelation Analysis")
 
         st.sidebar.subheader("Autocorrelation Area")
-        cross_index = st.sidebar.selectbox("autocorrelation index col", table.columns, 1)
-        cross_time = st.sidebar.selectbox("autocorrelation time col", table.columns, 3)
-        cross_col = st.sidebar.selectbox("autocorrelation X axis col", col_mul, 1)
-        crossSlider = st.sidebar.slider("autocorrelation time value", int(table[cross_time].min()), int(table[cross_time].max()-1), int(table[cross_time].min()))
+        cross_index = st.sidebar.selectbox("Autocorrelation index col", table.columns, 1)
+        cross_time = st.sidebar.selectbox("Autocorrelation time col", table.columns, 3)
+        cross_col = st.sidebar.selectbox("Autocorrelation X axis col", col_mul, 1)
+        crossSlider = st.sidebar.slider("Autocorrelation time value", int(table[cross_time].min()), int(table[cross_time].max()-1), int(table[cross_time].min()))
 
         dff_cross_dw = table[table[cross_time] == crossSlider][[cross_index, cross_col]]
         dff_cross_up = table[table[cross_time] == crossSlider + 1][[cross_index, cross_col]]
@@ -382,7 +382,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         st.write("Autocorrelation value: " + str(round(final_df_cross[cross_col + "_x"].corr(final_df_cross[cross_col + "_y"]), 5)))
 
         # difference timeseries plot
-        el_id_diff = st.selectbox("element ID for differences timeseries chart", table[cross_index].unique())
+        el_id_diff = st.selectbox("Id deltas timeseries", table[cross_index].unique())
 
         dff_diff = table[table[cross_index] == el_id_diff]
         if len(list(dff_diff[cross_time].unique())) < dff_diff.shape[0]:
@@ -426,15 +426,15 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         # pareto chart with feature importance on ridge regressor
         st.sidebar.subheader("Feature Importance Area")
         feaImp_target = st.sidebar.selectbox("Feature Importance target", col_mul, 1)
-        id_sel_col = st.sidebar.selectbox("ID column", table.columns, 2)
+        id_sel_col = st.sidebar.selectbox("ID/category column", table.columns, 2)
 
         st.header("Feature Importance Analysis")
         
         left, right = st.columns(2)
         with left: 
-            fea_Imp_features = st.multiselect("Feature Importance multiselection box:", col_mul)
+            fea_Imp_features = st.multiselect("Features:", col_mul)
         with right:
-            id_sel = st.selectbox("Index selection box:", ['All ids'] + list(table[id_sel_col].unique()), 0)
+            id_sel = st.selectbox("Index/category selection:", ['All ids'] + list(table[id_sel_col].unique()), 0)
         
         scaler = StandardScaler()
         if id_sel == 'All ids':
@@ -532,7 +532,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                    [int(result_norm[1] > 0.05), int(result_exp[1] > 0.05), int(result_lognorm[1] > 0.05), int(result_weibull2[1] > 0.05)]]
         st.table(pd.DataFrame(dis_fit, columns = ['Normal', 'Exponential', 'Log-Norm', 'Weibul'], index = ['P-value', 'P > t']))
 
-        ch_distr = st.selectbox("Choose the distribution you want to use for the anomalies estimation", ['Normal', 'Exponential', 'Log-Norm', 'Weibull'])
+        ch_distr = st.selectbox("Distribution anomalies estimation", ['Normal', 'Exponential', 'Log-Norm', 'Weibull'])
         fig_distr = go.Figure(data = [go.Histogram(x = var_clean, 
                                                    xbins = dict(start = var_clean.min(), end = var_clean.max(), size = (var_clean.max() - var_clean.min()) / 25),
                                                    autobinx = False, 
@@ -571,7 +571,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                     'that a smaller **k** will reduce the fence\'s size (you will find more outliers but less significant), while a bigger **k** will have an opposite effect,' + 
                     ' so this value must be chosen wisely.')
         
-        tukey_const = st.number_input("Insert the constant for the fence interquantile value", 0.5, 7.5, 1.5)
+        tukey_const = st.number_input("Tukey’s constant value", 0.5, 7.5, 1.5)
         Q3 = table[use_col].quantile(0.75); Q1 = table[use_col].quantile(0.25); ITQ = Q3- Q1
         
         if stats.skewtest(var_clean)[1] >= 0.025:
@@ -612,7 +612,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
         with left: 
             out_id_col = st.selectbox("Outlier index col", table.columns, 0)
         with right:
-            out_type = st.selectbox("Type of outliers you want to investigate", ['All', 'Strong left outliers', 'Weak left outliers', 'Weak right outliers', 'Strong right outliers'], 0)
+            out_type = st.selectbox("Outlier type", ['All', 'Strong left outliers', 'Weak left outliers', 'Weak right outliers', 'Strong right outliers'], 0)
         
         if out_type == 'All':
             df_AllOut['Sel'] = df_AllOut[out_id_col].str.slice(0, 2).values
@@ -707,40 +707,33 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
             st.write(df_AllOut) 
         
     if widget == "Consistency checks":
-        methodology = st.sidebar.selectbox("Choose the type of methodology you want to apply", ['Multiannual methodology', 'Ratio methodology'], 0)
+        methodology = st.sidebar.selectbox("Methodology to apply", ['Multiannual methodology', 'Ratio methodology'], 0)
         if methodology == 'Ratio methodology':
             con_checks_id_col = st.sidebar.selectbox("Index col", table.columns, 0)
-            country_sel_col = st.sidebar.selectbox("Country selection column", ['-'] + list(table.columns), 0)
-            cat_sel_col = st.sidebar.selectbox("Category selection column", ['-'] + list(table.columns), 0)
-            flag_issue_quantile = st.sidebar.number_input("Insert the quantile that will issue the flag (S2 and S3)", 0.0, 30.0, 5.0, 0.1)
-            prob_cases_per = st.sidebar.number_input("Insert the percentage for the problematic cases", 0.0, 100.0, 20.0)
-            p_value_trend_per = st.sidebar.number_input("Insert the p-value percentage for the trend estimation", 5.0, 50.0, 10.0)
+            country_sel_col = st.sidebar.selectbox("Country col", ['-'] + list(table.columns), 0)
+            cat_sel_col = st.sidebar.selectbox("Category col", ['-'] + list(table.columns), 0)
+            flag_issue_quantile = st.sidebar.number_input("Flags quantile (S2 and S3)", 0.0, 30.0, 5.0, 0.1)
+            prob_cases_per = st.sidebar.number_input("Percentage problematic cases", 0.0, 100.0, 20.0)
+            p_value_trend_per = st.sidebar.number_input("P-value percentage trend estimation", 5.0, 50.0, 10.0)
 
             new_ratio_radio = st.radio("Do you want to create a new ratio or you want to use an existing one:", ('Create a new ratio', 'Existing one'))
             if new_ratio_radio == 'Existing one':
-                con_checks_feature = st.selectbox("Variables chosen for the consistency checks:", col_mul)
-                flag_radio = st.radio("Do you want to use the flags:", ('Yes', 'No'))
-                if flag_radio == 'Yes':
-                    left1, right1 = st.columns(2)
-                    with left1:
-                        flags_col = st.selectbox("Select the specific flag variable for the checks", table.columns)
-                    with right1:
-                        notes_col = st.selectbox("Select the specific flag notes variable for the checks", ['-'] + list(table.columns))
+                con_checks_feature = st.selectbox("Variable consistency checks:", col_mul)
             else:
                 con_checks_feature = st.text_input('Write here the name of the new ratio', 'R_1')
                 left1, right1 = st.columns(2)
                 with left1:
-                    ratio_num = st.selectbox("Select the numerator column", col_mul)
+                    ratio_num = st.selectbox("Numerator column", col_mul)
                 with right1:
-                    ratio_den = st.selectbox("Select the denominator column", col_mul)
+                    ratio_den = st.selectbox("Denominator column", col_mul)
                 table = pd.concat([table, pd.DataFrame(np.divide(table[ratio_num].values, table[ratio_den].values), columns = [con_checks_feature])], axis = 1)
-                flag_radio = st.radio("Do you want to use the flags:", ('Yes', 'No'))
-                if flag_radio == 'Yes':
-                    left2, right2 = st.columns(2)
-                    with left2:
-                        flags_col = st.selectbox("Select the specific flag variable for the checks", table.columns)
-                    with right2:
-                        notes_col = st.selectbox("Select the specific flag notes variable for the checks", ['-'] + list(table.columns))
+            flag_radio = st.radio("Do you want to use the flags:", ('Yes', 'No'))
+            if flag_radio == 'Yes':
+                left1, right1 = st.columns(2)
+                with left1:
+                    flags_col = st.selectbox("Flag variable", table.columns)
+                with right1:
+                    notes_col = st.selectbox("Notes variable", ['-'] + list(table.columns))
             
 
             table['Class trend'] = 0
@@ -877,8 +870,8 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                                                    columns = ['Absolute Values', 'In percentage'], 
                                                    index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases']))
 
-                    trend_type = st.selectbox('Choose the institution trend type you want to vizualize', list(dict_trend.keys()), 0)
-                    trend_inst = st.selectbox('Choose the institution you want to vizualize', dict_trend[trend_type])
+                    trend_type = st.selectbox('Institution trend type', list(dict_trend.keys()), 0)
+                    trend_inst = st.selectbox('Institution to vizualize', dict_trend[trend_type])
                     st.plotly_chart(px.line(table[table[con_checks_id_col] == trend_inst][[con_checks_feature, 'Reference year']], 
                                             x = 'Reference year', y = con_checks_feature), use_container_width=True)
 
@@ -916,9 +909,9 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                 st.write('If you want to download the result file with all the issued flags you have first to choose at least the time column and then to clik on the following button:')
                 left1, right1 = st.columns(2)
                 with left1:
-                    time_col = st.selectbox("Select the variable from wich you want to extract the time values:", table.columns)
+                    time_col = st.selectbox("Variable time values::", table.columns)
                 with right1:
-                    descr_col = st.multiselect("Select the desciptive columns you want to add to the result dataset:", table.columns)
+                    descr_col = st.multiselect("Descriptive columns:", table.columns)
 
                 t_col = [str(el) for el in sorted(table[time_col].unique())]; list_fin = []
                 if flag_radio == 'Yes':
@@ -964,21 +957,21 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                 st.warning('you have to choose a value for the field "Category selection column".')
         else:
             con_checks_id_col = st.sidebar.selectbox("Index col", table.columns, 0)
-            country_sel_col = st.sidebar.selectbox("Country selection column", ['-'] + list(table.columns), 0)
-            cat_sel_col = st.sidebar.selectbox("Category selection column", ['-'] + list(table.columns), 0)
-            retain_quantile = st.sidebar.number_input("Insert the quantile you want to exclude from the calculations (S1)", 1.0, 10.0, 2.0, 0.1)
-            flag_issue_quantile = st.sidebar.number_input("Insert the quantile that will issue the flag (S2 and S3)", 35.0, 100.0, 95.0, 0.1)
-            prob_cases_per = st.sidebar.number_input("Insert the percentage for the problematic cases", 0.0, 100.0, 20.0)
-            p_value_trend_per = st.sidebar.number_input("Insert the p-value percentage for the trend estimation", 5.0, 50.0, 10.0)
+            country_sel_col = st.sidebar.selectbox("Country col", ['-'] + list(table.columns), 0)
+            cat_sel_col = st.sidebar.selectbox("Category col", ['-'] + list(table.columns), 0)
+            retain_quantile = st.sidebar.number_input("Quantile to exclude from the calculation (S1)", 1.0, 10.0, 2.0, 0.1)
+            flag_issue_quantile = st.sidebar.number_input("Flags quantile (S2 and S3)", 35.0, 100.0, 95.0, 0.1)
+            prob_cases_per = st.sidebar.number_input("Percentage problematic cases", 0.0, 100.0, 20.0)
+            p_value_trend_per = st.sidebar.number_input("P-value percentage trend estimation", 5.0, 50.0, 10.0)
 
-            con_checks_features = st.selectbox("Variables chosen for the consistency checks:", col_mul)
+            con_checks_features = st.selectbox("Variable consistency checks:", col_mul)
             flag_radio = st.radio("Do you want to use the flags:", ('Yes', 'No'))
             if flag_radio == 'Yes':
                 left1, right1 = st.columns(2)
                 with left1:
-                    flags_col = st.selectbox("Select the specific flag variable for the checks", table.columns)
+                    flags_col = st.selectbox("Flag variable", table.columns)
                 with right1:
-                    notes_col = st.selectbox("Select the specific flag notes variable for the checks", ['-'] + list(table.columns))
+                    notes_col = st.selectbox("Notes variable", ['-'] + list(table.columns))
                 
             res_ind = dict(); table['Class trend'] = 0
             for id_inst in table[con_checks_id_col].unique():
@@ -1155,8 +1148,8 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                                                index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases'])
                 st.table(summ_table)
             
-            trend_type = st.selectbox('Choose the institution trend type you want to visualize', list(dict_trend.keys()), 0)
-            trend_inst = st.selectbox('Choose the institution you want to vizualize', dict_trend[trend_type])
+            trend_type = st.selectbox('Institution trend type', list(dict_trend.keys()), 0)
+            trend_inst = st.selectbox('Institution to vizualize', dict_trend[trend_type])
             line_trend_ch_inst = px.line(table[table[con_checks_id_col] == trend_inst][[con_checks_features, 'Reference year']], x = 'Reference year', y = con_checks_features)
             line_trend_ch_inst.update_yaxes(range = [0, max(table[table[con_checks_id_col] == trend_inst][con_checks_features].values) + (.05 * max(table[table[con_checks_id_col] == trend_inst][con_checks_features].values))])
             st.plotly_chart(line_trend_ch_inst, use_container_width=True)
@@ -1210,7 +1203,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
             # part of confronting trends
             conf_trend_radio = st.radio("Do you want to compare trends?", ('Yes', 'No'), key = 'conf_trend_ratio')
             if conf_trend_radio == 'Yes':
-                conf_trend_var = st.selectbox("Select the variable that you want to compare:", col_mul, key = 'conf_trend_var'); set_not_det = set()
+                conf_trend_var = st.selectbox("Variable to compare:", col_mul, key = 'conf_trend_var'); set_not_det = set()
                 set_inc_inc = set(); set_inc_ukn = set(); set_inc_dec = set()
                 set_ukn_inc = set(); set_ukn_ukn = set(); set_ukn_dec = set()
                 set_dec_inc = set(); set_dec_ukn = set(); set_dec_dec = set()
@@ -1258,9 +1251,9 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
             st.write('If you want to download the result file with all the issued flags you have first to choose at least the time column and then to clik on the following button:')
             left1, right1 = st.columns(2)
             with left1:
-                time_col = st.selectbox("Select the variable from wich you want to extract the time values:", table.columns)
+                time_col = st.selectbox("Variable time values:", table.columns)
             with right1:
-                descr_col = st.multiselect("Select the desciptive columns you want to add to the result dataset:", table.columns)
+                descr_col = st.multiselect("Descriptive columns:", table.columns)
 
             t_col = [str(el) for el in sorted(table[time_col].unique())]; list_fin = []
             if flag_radio == 'Yes':
