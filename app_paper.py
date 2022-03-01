@@ -707,8 +707,8 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
             st.write(df_AllOut) 
         
     if widget == "Consistency checks":
-        methodology = st.sidebar.selectbox("Methodology to apply", ['Multiannual methodology', 'Ratio methodology'], 0)
-        if methodology == 'Ratio methodology':
+        methodology = st.sidebar.selectbox("Analysis to apply", ['Multiannual analysis', 'Ratio analysis'], 0)
+        if methodology == 'Ratio analysis':
             con_checks_id_col = st.sidebar.selectbox("Index col", table.columns, 0)
             country_sel_col = st.sidebar.selectbox("Country col", ['-'] + list(table.columns), 0)
             cat_sel_col = st.sidebar.selectbox("Category col", ['-'] + list(table.columns), 0)
