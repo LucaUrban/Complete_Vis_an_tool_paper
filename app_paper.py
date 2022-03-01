@@ -832,13 +832,13 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                                                    [str(len(dict_check_flags[con_checks_feature])) + ' / ' + str(len(ones.union(twos))), str(round(100 * (len(dict_check_flags[con_checks_feature]) / len(ones.union(twos))), 2)) + '%'], 
                                                    [str(len(dict_check_flags[con_checks_feature].difference(ones.union(twos)))), str(round((100 * len(dict_check_flags[con_checks_feature].difference(ones.union(twos)))) / len(dict_check_flags[con_checks_feature]), 2)) + '%']], 
                                                    columns = ['Absolute Values', 'In percentage'], 
-                                                   index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases'])
+                                                   index = ['Accuracy', 'new/prev cases', 'Extra cases'])
                     else:
                         summ_table = pd.DataFrame([[str(len(ones.intersection(dict_check_flags[con_checks_feature]))) + ' over ' + str(len(ones)), str(round((100 * len(ones.intersection(dict_check_flags[con_checks_feature]))) / len(ones), 2)) + '%'], 
                                                    [str(len(dict_check_flags[con_checks_feature])) + ' / ' + str(len(ones)), str(round(100 * (len(dict_check_flags[con_checks_feature]) / len(ones)), 2)) + '%'], 
                                                    [str(len(dict_check_flags[con_checks_feature].difference(ones))), str(round((100 * len(dict_check_flags[con_checks_feature].difference(ones))) / len(dict_check_flags[con_checks_feature]), 2)) + '%']], 
                                                    columns = ['Absolute Values', 'In percentage'], 
-                                                   index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases'])
+                                                   index = ['Accuracy', 'new/prev cases', 'Extra cases'])
                     st.table(summ_table)
 
                 table_fin_res = pd.DataFrame(list_fin_res, index = [con_checks_feature + ' (' + str(cat) + ')' for cat in categories] + ['Total'], columns = countries + ['Total'])
@@ -862,13 +862,13 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                                                    [str(len(set_trend)) + ' / ' + str(len(ones.union(twos))), str(round(100 * (len(set_trend) / len(ones.union(twos))), 2)) + '%'], 
                                                    [str(len(set_trend.difference(ones.union(twos)))), str(100 * len(set_trend.difference(ones.union(twos))) / len(dict_check_flags[con_checks_feature])) + '%']], 
                                                    columns = ['Absolute Values', 'In percentage'], 
-                                                   index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases']))
+                                                   index = ['Accuracy', 'new/prev cases', 'Extra cases']))
                         else:
                             st.table(pd.DataFrame([[str(len(ones.intersection(set_trend))) + ' over ' + str(len(ones)), str(round((100 * len(ones.intersection(set_trend))) / len(ones), 2)) + '%'], 
                                                    [str(len(set_trend)) + ' / ' + str(len(ones)), str(round(100 * (len(set_trend) / len(ones)), 2)) + '%'], 
                                                    [str(len(set_trend.difference(ones))), str(100 * len(set_trend.difference(ones)) / len(dict_check_flags[con_checks_feature])) + '%']], 
                                                    columns = ['Absolute Values', 'In percentage'], 
-                                                   index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases']))
+                                                   index = ['Accuracy', 'new/prev cases', 'Extra cases']))
 
                     trend_type = st.selectbox('Institution trend type', list(dict_trend.keys()), 0)
                     trend_inst = st.selectbox('Institution to vizualize', dict_trend[trend_type])
@@ -1108,13 +1108,13 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                                                [str(len(dict_check_flags)) + ' / ' + str(len(ones.union(twos))), str(round(100 * (len(dict_check_flags) / len(ones.union(twos))), 2)) + '%'], 
                                                [str(len(dict_check_flags.difference(ones.union(twos)))), str(round((100 * len(dict_check_flags.difference(ones.union(twos)))) / len(dict_check_flags), 2)) + '%']], 
                                                columns = ['Absolute Values', 'In percentage'], 
-                                               index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases'])
+                                               index = ['Accuracy', 'new/prev cases', 'Extra cases'])
                 else:
                     summ_table = pd.DataFrame([[str(len(ones.intersection(dict_check_flags))) + ' over ' + str(len(ones)), str(round((100 * len(ones.intersection(dict_check_flags))) / len(ones), 2)) + '%'], 
                                                [str(len(dict_check_flags)) + ' / ' + str(len(ones)), str(round(100 * (len(dict_check_flags) / len(ones)), 2)) + '%'], 
                                                [str(len(dict_check_flags.difference(ones))), str(round((100 * len(dict_check_flags.difference(ones))) / len(dict_check_flags), 2)) + '%']], 
                                                columns = ['Absolute Values', 'In percentage'], 
-                                               index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases'])
+                                               index = ['Accuracy', 'new/prev cases', 'Extra cases'])
                 st.table(summ_table)
 
             st.table(table_fin_res)
@@ -1139,13 +1139,13 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                                                [str(len(set_trend)) + ' / ' + str(len(ones.union(twos))), str(round(100 * (len(set_trend) / len(ones.union(twos))), 2)) + '%'], 
                                                [str(len(set_trend.difference(ones.union(twos)))), str(round((100 * len(set_trend.difference(ones.union(twos)))) / len(set_trend), 2)) + '%']], 
                                                columns = ['Absolute Values', 'In percentage'], 
-                                               index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases'])
+                                               index = ['Accuracy', 'new/prev cases', 'Extra cases'])
                 else:
                     summ_table = pd.DataFrame([[str(len(ones.intersection(set_trend))) + ' over ' + str(len(ones)), str(round((100 * len(ones.intersection(set_trend))) / len(ones), 2)) + '%'], 
                                                [str(len(set_trend)) + ' / ' + str(len(ones)), str(round(100 * (len(set_trend) / len(ones)), 2)) + '%'], 
                                                [str(len(set_trend.difference(ones))), str(round((100 * len(set_trend.difference(ones))) / len(set_trend), 2)) + '%']], 
                                                columns = ['Absolute Values', 'In percentage'], 
-                                               index = ['Accuracy respect the confirmed cases', '#application cases vs. #standard cases', 'Number of not flagged cases'])
+                                               index = ['Accuracy', 'new/prev cases', 'Extra cases'])
                 st.table(summ_table)
             
             trend_type = st.selectbox('Institution trend type', list(dict_trend.keys()), 0)
