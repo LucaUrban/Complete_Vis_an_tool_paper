@@ -906,12 +906,12 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                 dict_pr_inst = {k: [len(v), ' '.join(v)] for k, v in dict_pr_inst.items()}
                 st.table(pd.DataFrame(dict_pr_inst.values(), index = dict_pr_inst.keys(), columns = ['# of problems', 'Probematic variables']).head(25))
 
-                st.write('If you want to download the result file with all the issued flags you have first to choose at least the time column and then to clik on the following button:')
+                st.write('To download the results select a time variable and then click the Download data button')
                 left1, right1 = st.columns(2)
                 with left1:
-                    time_col = st.selectbox("Variable time values::", table.columns)
+                    time_col = st.selectbox("Time variable:", table.columns)
                 with right1:
-                    descr_col = st.multiselect("Descriptive columns:", table.columns)
+                    descr_col = st.multiselect("Select Descriptive columns to add to results (optional):", table.columns)
 
                 t_col = [str(el) for el in sorted(table[time_col].unique())]; list_fin = []
                 if flag_radio == 'Yes':
@@ -1203,7 +1203,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
             # part of confronting trends
             conf_trend_radio = st.radio("Do you want to compare trends?", ('Yes', 'No'), key = 'conf_trend_ratio')
             if conf_trend_radio == 'Yes':
-                conf_trend_var = st.selectbox("Variable to compare:", col_mul, key = 'conf_trend_var'); set_not_det = set()
+                conf_trend_var = st.selectbox("Select Variable:", col_mul, key = 'conf_trend_var'); set_not_det = set()
                 set_inc_inc = set(); set_inc_ukn = set(); set_inc_dec = set()
                 set_ukn_inc = set(); set_ukn_ukn = set(); set_ukn_dec = set()
                 set_dec_inc = set(); set_dec_ukn = set(); set_dec_dec = set()
@@ -1246,14 +1246,14 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                 st.table(pd.DataFrame(table_conf_trend, 
                                       index = ['(' + conf_trend_var + ') ' + 'Increasing', '(' + conf_trend_var + ') ' + 'Unknown', '(' + conf_trend_var + ') ' + 'Decreasing'], 
                                       columns = ['(' + con_checks_features + ') ' + 'Increasing', '(' + con_checks_features + ') ' + 'Unknown', '(' + con_checks_features + ') ' + 'Decreasing']))
-                st.write('The number of institution that couldn\'t be classified because of lacking data: ' + str(len(set_not_det)))
+                st.write('Institutions with too much lacking data: ' + str(len(set_not_det)))
             
-            st.write('If you want to download the result file with all the issued flags you have first to choose at least the time column and then to clik on the following button:')
+            st.write('To download the results select a time variable and then click the Download data button')
             left1, right1 = st.columns(2)
             with left1:
-                time_col = st.selectbox("Variable time values:", table.columns)
+                time_col = st.selectbox("Time variable:", table.columns)
             with right1:
-                descr_col = st.multiselect("Descriptive columns:", table.columns)
+                descr_col = st.multiselect("Select Descriptive columns to add to results (optional):", table.columns)
 
             t_col = [str(el) for el in sorted(table[time_col].unique())]; list_fin = []
             if flag_radio == 'Yes':
