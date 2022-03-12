@@ -1246,7 +1246,7 @@ if demo_data_radio == 'Demo datset' or uploaded_file is not None:
                 st.table(pd.DataFrame(table_conf_trend, 
                                       index = ['(' + conf_trend_var + ') ' + 'Increasing', '(' + conf_trend_var + ') ' + 'Unknown', '(' + conf_trend_var + ') ' + 'Decreasing'], 
                                       columns = ['(' + con_checks_features + ') ' + 'Increasing', '(' + con_checks_features + ') ' + 'Unknown', '(' + con_checks_features + ') ' + 'Decreasing']))
-                st.write('Institutions with too much lacking data: ' + str(len(set_not_det)))
+                st.write('Institutions with missing data: ' + str(len(set_not_det)))
             
             st.write('To download the results select a time variable and then click the Download data button')
             left1, right1 = st.columns(2)
